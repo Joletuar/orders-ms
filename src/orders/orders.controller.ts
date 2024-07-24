@@ -1,10 +1,11 @@
 import { Controller, ParseUUIDPipe } from '@nestjs/common';
-import { MessagePattern, Payload, RpcException } from '@nestjs/microservices';
+import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { PaginationDto } from './dto/pagination.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
+import { PaymentSuccededDto } from './dto/payment-succeded.dto';
 
 @Controller('orders')
 export class OrdersController {
@@ -12,11 +13,10 @@ export class OrdersController {
 
   @MessagePattern('createOrder')
   async create(@Payload() createOrderDto: CreateOrderDto) {
-    try {
-      return await this.ordersService.create(createOrderDto);
-    } catch (error) {
-      throw new RpcException(error);
-    }
+    const order = await this.ordersService.create(createOrderDto);
+    const paymentSession = await this.ordersService.createPaymentSession(order);
+
+    return { order, paymentSession };
   }
 
   @MessagePattern('findAllOrders')
@@ -35,5 +35,10 @@ export class OrdersController {
   @MessagePattern('changeOrderStatus')
   changeOrderStatus(@Payload() updateOrderStatusDto: UpdateOrderStatusDto) {
     return this.ordersService.changeOrderStatus(updateOrderStatusDto);
+  }
+
+  @EventPattern('payment.succeded') // Event pattern para estar pendiente de eventos
+  paidOder(@Payload() paymentSuccededDto: PaymentSuccededDto) {
+    this.ordersService.paidOder(paymentSuccededDto);
   }
 }
