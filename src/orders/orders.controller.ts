@@ -5,7 +5,7 @@ import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { PaginationDto } from './dto/pagination.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
-import { PaymentSuccededDto } from './dto/payment-succeded.dto';
+import { PaidOrderDto } from './dto/paid-order.dto';
 
 @Controller('orders')
 export class OrdersController {
@@ -38,7 +38,7 @@ export class OrdersController {
   }
 
   @EventPattern('payment.succeded') // Event pattern para estar pendiente de eventos
-  paidOder(@Payload() paymentSuccededDto: PaymentSuccededDto) {
-    this.ordersService.paidOder(paymentSuccededDto);
+  paidOder(@Payload() paidOrderDto: PaidOrderDto) {
+    this.ordersService.paidOder(paidOrderDto);
   }
 }

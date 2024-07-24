@@ -15,7 +15,7 @@ import { PaginationDto } from './dto/pagination.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { NATS_SERVICE } from 'src/config/services';
 import { OrderWithProducts } from './interfaces/order-with-products.interface';
-import { PaymentSuccededDto } from './dto/payment-succeded.dto';
+import { PaidOrderDto } from './dto/paid-order.dto';
 
 @Injectable()
 export class OrdersService extends PrismaClient implements OnModuleInit {
@@ -239,12 +239,27 @@ export class OrdersService extends PrismaClient implements OnModuleInit {
     return paymentSession;
   }
 
-  async paidOder(paymentSuccededDto: PaymentSuccededDto) {
-    const { orderId } = paymentSuccededDto;
+  async paidOder(paymentSuccededDto: PaidOrderDto) {
+    const { orderId, receiptUrl, stripePaymentId } = paymentSuccededDto;
 
-    await this.changeOrderStatus({
-      id: orderId,
-      status: 'DELIVERED',
+    this.logger.log({ paymentSuccededDto });
+
+    await this.order.update({
+      where: {
+        id: orderId,
+      },
+      data: {
+        status: 'PAID',
+        paid: true,
+        stripeChargeId: stripePaymentId,
+
+        // Relacion de 1 - 1
+        OrderReceipt: {
+          create: {
+            receiptUrl,
+          },
+        },
+      },
     });
   }
 }
