@@ -13,10 +13,8 @@ steps:
         'push',
         'southamerica-west1-docker.pkg.dev/microservices-nest-dev/register-nest-dev/nest-microservices-orders:1.0.0',
       ]
-
 options:
   logging: CLOUD_LOGGING_ONLY
-
 availableSecrets:
   secretManager:
     - versionName: projects/72541533965/secrets/orders_database_url/versions/1
