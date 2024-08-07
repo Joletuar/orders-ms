@@ -22,6 +22,7 @@ COPY . .
 COPY --from=base /app/node_modules node_modules
 
 RUN pnpx prisma migrate deploy
+RUN pnpx prisma generate
 RUN pnpm build
 RUN pnpm prune --prod
 
