@@ -1,20 +1,23 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
     args:
-      [
-        'build',
-        '-t',
-        'southamerica-west1-docker.pkg.dev/microservices-nest-dev/register-nest-dev/nest-microservices-orders:1.0.0',
-        '-f',
-        'dockerfile.prod',
-        '--platform=linux/amd64',
-        '.',
-      ]
+      - -c
+      - |
+        docker build -t southamerica-west1-docker.pkg.dev/microservices-nest-dev/register-nest-dev/nest-microservices-orders:1.0.0 -f dockerfile.prod --platform=linux/amd64 --build-arg ORDERS_DATABASE_URL=$$DATABASE_URL .
+    secretEnv: ['DATABASE_URL']
+
   - name: 'gcr.io/cloud-builders/docker'
     args:
       [
         'push',
         'southamerica-west1-docker.pkg.dev/microservices-nest-dev/register-nest-dev/nest-microservices-orders:1.0.0',
       ]
+
 options:
   logging: CLOUD_LOGGING_ONLY
+
+availableSecrets:
+  secretManager:
+    - versionName: projects/72541533965/secrets/orders_database_url
+      env: 'DATABASE_URL'
