@@ -13,7 +13,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { PaginationDto } from './dto/pagination.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
-import { NATS_SERVICE } from 'src/config/services';
+import { PAYMENTS_SERVICE, PRODUCTS_SERVICE } from 'src/config';
 import { OrderWithProducts } from './interfaces/order-with-products.interface';
 import { PaidOrderDto } from './dto/paid-order.dto';
 
@@ -22,8 +22,10 @@ export class OrdersService extends PrismaClient implements OnModuleInit {
   private readonly logger = new Logger('OrdersService');
 
   constructor(
-    @Inject(NATS_SERVICE)
-    private readonly client: ClientProxy,
+    @Inject(PAYMENTS_SERVICE)
+    private readonly paymentsClient: ClientProxy,
+    @Inject(PRODUCTS_SERVICE)
+    private readonly productssClient: ClientProxy,
   ) {
     super();
   }
@@ -99,7 +101,7 @@ export class OrdersService extends PrismaClient implements OnModuleInit {
 
   private async ensureAreValidProducts(ids: Array<number>) {
     return await firstValueFrom(
-      this.client.send({ cmd: 'validateProduct' }, ids),
+      this.productssClient.send({ cmd: 'validateProduct' }, ids),
     );
   }
 
@@ -225,7 +227,7 @@ export class OrdersService extends PrismaClient implements OnModuleInit {
 
   async createPaymentSession(order: OrderWithProducts) {
     const paymentSession = await firstValueFrom(
-      this.client.send('create.payment.session', {
+      this.paymentsClient.send('create.payment.session', {
         orderId: order.id,
         currency: 'usd',
         items: order.OrderItem.map(({ price, productName, quantity }) => ({

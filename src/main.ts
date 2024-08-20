@@ -7,14 +7,18 @@ import { AppModule } from './app.module';
 import { envs } from './config/envs';
 
 async function bootstrap() {
-  const logger = new Logger('Orders-Service');
-
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     AppModule,
     {
-      transport: Transport.NATS,
+      transport: Transport.RMQ,
       options: {
-        servers: envs.NATS_SERVER,
+        queue: 'orders',
+        urls: [envs.RABBITMQ_SERVER],
+        noAck: false,
+        queueOptions: {
+          durable: true,
+          autoDelete: false,
+        },
       },
     },
   );
@@ -27,6 +31,8 @@ async function bootstrap() {
   );
 
   await app.listen();
+
+  const logger = new Logger('Boostrap');
 
   logger.log(`Orders MS runnign on ${envs.port}`);
 }
