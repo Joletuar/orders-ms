@@ -12,5 +12,4 @@ COPY . .
 RUN npm install -g pnpm
 RUN pnpm install
 
-ARG PORT
-EXPOSE $PORT
+EXPOSE 3000

@@ -44,9 +44,6 @@ importers:
       joi:
         specifier: 17.13.1
         version: 17.13.1
-      nats:
-        specifier: 2.28.0
-        version: 2.28.0
       reflect-metadata:
         specifier: 0.2.0
         version: 0.2.0
@@ -5436,6 +5433,7 @@ snapshots:
   nats@2.28.0:
     dependencies:
       nkeys.js: 1.1.0
+    optional: true
 
   natural-compare-lite@1.4.0: {}
 
@@ -5448,6 +5446,7 @@ snapshots:
   nkeys.js@1.1.0:
     dependencies:
       tweetnacl: 1.0.3
+    optional: true
 
   node-abort-controller@3.1.1: {}
 
@@ -6025,7 +6024,8 @@ snapshots:
 
   tslib@2.6.2: {}
 
-  tweetnacl@1.0.3: {}
+  tweetnacl@1.0.3:
+    optional: true
 
   type-check@0.4.0:
     dependencies:
